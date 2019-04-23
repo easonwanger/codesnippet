@@ -62,7 +62,7 @@ function findFatest2(urls) {
             fetch(url).then(function (r) {
                 if (r.ok && r.status === 200&& !resolved ) {
                     resolved = true
-                    rs(url)
+                    rs(r.url)
                 }
             })
 
