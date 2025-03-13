@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <button id="btn">update sw</button>
+    <button id="btnActivate">activate sw</button>
+    <button id="btnFetch">fetch</button>
+    <button id="btnMsg">message</button>
+    <input type="text" />
+    <script>
+        if ("serviceWorker" in navigator) {
+
+            navigator.serviceWorker
+                .register("sw1.js")
+                .then((reg) => {
+                    reg.onupdatefound = () => {
+                        const newWorker = reg.installing;
+                        newWorker.onstatechange = () => {
+                            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                                console.log("新 Service Worker 已安装！请刷新页面以生效。");
+
+                            }
+                        };
+
+                    };
+
+                    // 监听按钮点击
+                    document.getElementById("btnActivate").addEventListener("click", () => {
+                        if (reg.waiting) {
+                            // 通知 waiting 状态的 SW 执行 skipWaiting()
+                            reg.waiting.postMessage({ type: "SKIP_WAITING" });
+                            console.log("已通知等待中的 SW 执行 skipWaiting");
+                        } else {
+                            console.log("没有等待中的 SW，或已是最新版本");
+                        }
+                    });
+
+                    console.log("Service Worker registered successfully")
+                })
+                .catch((err) => console.log("Service Worker registration failed", err));
+
+
+        }
+
+
+        document.getElementById('btn').addEventListener('click', () => {
+            console.log('Button clicked!');
+            navigator.serviceWorker.ready.then((registration) => {
+                console.log('Service Worker Ready');
+                return registration.update();
+            }).then(() => {
+                console.log('Service Worker Updated');
+
+            });
+
+        });
+
+        document.getElementById('btnMsg').addEventListener('click', () => {
+            console.log('Button Msg clicked!');
+            navigator.serviceWorker.controller.postMessage('33');
+
+        });
+        document.getElementById('btnFetch').addEventListener('click', () => {
+            console.log('Button Fetch clicked!');
+
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
+        });
+
+    </script>
+</body>
+
+</html>
